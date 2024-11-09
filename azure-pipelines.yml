@@ -49,7 +49,7 @@ stages:
             skip_api_build: true
             workingDirectory: '/home/vsts/work/1/drop_$(environment)'
             app_location: browser
-            deployment_environment: $(environment)
+            #deployment_environment: $(environment)
             azure_static_web_apps_api_token: $(deployment_token)
 
 
