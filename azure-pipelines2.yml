@@ -35,15 +35,15 @@ stages:
             versionSpec: '20.x'
           displayName: 'Install Node.js'
         - script: |
-            echo 'build $(stageName)'
+            echo $(stageName)
             npm install -g @angular/cli
             npm install
             ng build -c $(stageName) --output-path $(Build.ArtifactStagingDirectory)/$(stageName)
           displayName: 'npm install and build'  
 
-        - publish: $format('{0}/{1}',variables['Build.ArtifactStagingDirectory'], variables['stageName'])
+        - publish: $format('{0}/{1}',variables['Build.ArtifactStagingDirectory'], variables.stageName)
           displayName: 'Publish script'
-          artifact: $format('drop_{0}', variables['stageName'])
+          artifact: $format('drop_{0}', variables.stageName)
   - stage: Deploy
     dependsOn: Build
     condition: succeeded('Build')
@@ -54,9 +54,9 @@ stages:
           vmImage: 'ubuntu-latest'
         steps: 
         - download: current
-          artifact: $format('drop_{0}', variables['stageName'])
+          artifact: $format('drop_{0}', variables.stageName)
         - script: |
-              echo 'build $(stageName)'
+              echo $(stageName)
               ls -l
               cd /home/vsts/work/1/drop_$(stageName)
               ls -l
@@ -64,7 +64,7 @@ stages:
           inputs:
             skip_app_build: true 
             skip_api_build: true
-            workingDirectory: $format('/home/vsts/work/1/drop_{0}', variables['stageName'])
+            workingDirectory: $format('/home/vsts/work/1/drop_{0}', variables.stageName)
             app_location: browser
-            deployment_environment: ${{ variables['stageName'] }}
-            azure_static_web_apps_api_token: ${{ variables['deployToken'] }}         
+            deployment_environment: ${{ variables.stageName }}
+            azure_static_web_apps_api_token: ${{ variables.deployToken }}         
