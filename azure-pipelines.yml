@@ -13,11 +13,9 @@ stages:
   - stage: Build  
     jobs:
       - job: Build
-        displayName: Build
+        displayName: 'Build job'
         pool:
           vmImage: 'ubuntu-latest'
-        variables:
-          BuildConfiguration: 'Release' 
         steps:
         - task: NodeTool@0
           inputs:
@@ -29,19 +27,20 @@ stages:
             npm install
             ng build -c $(environment)
           displayName: 'npm install and build'
-        - task: ArchiveFiles@2
-          displayName: Zip Angular dist folder
+        - task: CopyFiles@2
+          displayName: 'Copiando arquivos'
           inputs:
-            rootFolderOrFile: 'dist/exemplo'
-            includeRootFolder: false
-            archiveType: 'zip'
-            archiveFile: '$(Build.ArtifactStagingDirectory)/$(environment).zip'
-            replaceExistingArchive: true  
+            #SourceFolder: # string. Source Folder. 
+            Contents: 'dist/exemplo' 
+            TargetFolder: '$(Build.ArtifactStagingDirectory)/$(environment)'      
   - stage: Deploy
     dependsOn: Build
     condition: succeeded('Build')
     jobs:
-      - job: 
+      - job: Deploy
+        displayName: 'Deploy job'
+        pool:
+          vmImage: 'ubuntu-latest'
         steps: 
         - script: |
               echo 'build $(environment)'
