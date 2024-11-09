@@ -27,8 +27,6 @@ stages:
     jobs:
       - job: Build
         displayName: 'Build job'
-        pool:
-          vmImage: 'ubuntu-latest'
         steps:
         - task: NodeTool@0
           inputs:
@@ -41,17 +39,15 @@ stages:
             ng build -c $(stageName) --output-path $(Build.ArtifactStagingDirectory)/$(stageName)
           displayName: 'npm install and build'  
 
-        - publish: $format('{0}/{1}',variables['Build.ArtifactStagingDirectory'], variables.stageName)
+        - publish: '$(Build.ArtifactStagingDirectory)/${{ variables.stageName }}'
           displayName: 'Publish script'
-          artifact: $format('drop_{0}', variables.stageName)
+          artifact: 'drop_${{ variables.stageName}}'
   - stage: Deploy
     dependsOn: Build
     condition: succeeded('Build')
     jobs:
       - job: Deploy
         displayName: 'Deploy job'
-        pool:
-          vmImage: 'ubuntu-latest'
         steps: 
         - download: current
           artifact: $format('drop_{0}', variables.stageName)
