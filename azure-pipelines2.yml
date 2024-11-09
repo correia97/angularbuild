@@ -13,6 +13,11 @@ variables:
       value: production
     ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/stage') }}: # only works if you have a main branch
       value: stage
+  - name: deployToken
+    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/main') }}: # only works if you have a main branch
+      value: $(deployment_token_prod)
+    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/stage') }}: # only works if you have a main branch
+      value: $(deployment_token_stage)
 
 pool:
   vmImage: ubuntu-latest
@@ -62,7 +67,7 @@ stages:
             workingDirectory: $format('/home/vsts/work/1/drop_{0}', variables['stageName'])
             app_location: browser
             deployment_environment: ${{ variables['stageName'] }}
-            azure_static_web_apps_api_token: $(deployment_token_{{ stageName }})
+            azure_static_web_apps_api_token: ${{ deployToken }}
 
 
           
