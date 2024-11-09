@@ -27,6 +27,10 @@ stages:
             npm install
             ng build -c $(environment) --output-path $(Build.ArtifactStagingDirectory)/$(environment)
           displayName: 'npm install and build'  
+
+        - publish: '$(Build.ArtifactStagingDirectory)//$(environment)'
+          displayName: 'Publish script'
+          artifact: drop_$(environment)
   - stage: Deploy
     dependsOn: Build
     condition: succeeded('Build')
@@ -36,8 +40,13 @@ stages:
         pool:
           vmImage: 'ubuntu-latest'
         steps: 
+        - download: current
+          artifact: drop_$(environment)
         - script: |
               echo 'build $(environment)'
+              ls -l
+              cd $(Build.ArtifactStagingDirectory)/$(environment)
+              ls -l
         - task: AzureStaticWebApp@0
           inputs:
             skip_app_build: true 
