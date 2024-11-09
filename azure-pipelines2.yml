@@ -60,7 +60,7 @@ stages:
           inputs:
             skip_app_build: true 
             skip_api_build: true
-            workingDirectory: $format('/home/vsts/work/1/drop_{0}', variables.stageName)
+            workingDirectory:  '$(Build.ArtifactStagingDirectory)/${{ variables.stageName }}'
             app_location: browser
             deployment_environment: ${{ variables.stageName }}
             azure_static_web_apps_api_token: ${{ variables.deployToken }}         
