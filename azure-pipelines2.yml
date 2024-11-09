@@ -1,0 +1,68 @@
+# Node.js with Angular
+# Build a Node.js project that uses Angular.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- main
+- stage
+
+variables:
+  - name: stageName
+    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/main') }}: # only works if you have a main branch
+      value: production
+    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/stage') }}: # only works if you have a main branch
+      value: stage
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build  
+    jobs:
+      - job: Build
+        displayName: 'Build job'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '20.x'
+          displayName: 'Install Node.js'
+        - script: |
+            echo 'build ${{ variables['stageName'] }}'
+            npm install -g @angular/cli
+            npm install
+            ng build -c ${{ variables['stageName'] }} --output-path $(Build.ArtifactStagingDirectory)/${{ variables['stageName'] }}
+          displayName: 'npm install and build'  
+
+        - publish: $format('{0}/{1}',variables['Build.ArtifactStagingDirectory'], variables['stageName'])
+          displayName: 'Publish script'
+          artifact: $format('drop_{0}', variables['stageName'])
+  - stage: Deploy
+    dependsOn: Build
+    condition: succeeded('Build')
+    jobs:
+      - job: Deploy
+        displayName: 'Deploy job'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps: 
+        - download: current
+          artifact: $format('drop_{0}', variables['stageName'])
+        - script: |
+              echo 'build ${{ variables['stageName'] }}'
+              ls -l
+              cd /home/vsts/work/1/drop_${{ variables['stageName'] }}
+              ls -l
+        - task: AzureStaticWebApp@0
+          inputs:
+            skip_app_build: true 
+            skip_api_build: true
+            workingDirectory: $format('/home/vsts/work/1/drop_{0}', variables['stageName'])
+            app_location: browser
+            deployment_environment: ${{ variables['stageName'] }}
+            azure_static_web_apps_api_token: $(deployment_token_{{ stageName }})
+
+
+          
