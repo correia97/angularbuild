@@ -35,10 +35,10 @@ stages:
             versionSpec: '20.x'
           displayName: 'Install Node.js'
         - script: |
-            echo 'build ${{ variables['stageName'] }}'
+            echo 'build $(stageName)'
             npm install -g @angular/cli
             npm install
-            ng build -c ${{ variables['stageName'] }} --output-path $(Build.ArtifactStagingDirectory)/${{ variables['stageName'] }}
+            ng build -c $(stageName) --output-path $(Build.ArtifactStagingDirectory)/$(stageName)
           displayName: 'npm install and build'  
 
         - publish: $format('{0}/{1}',variables['Build.ArtifactStagingDirectory'], variables['stageName'])
@@ -56,9 +56,9 @@ stages:
         - download: current
           artifact: $format('drop_{0}', variables['stageName'])
         - script: |
-              echo 'build ${{ variables['stageName'] }}'
+              echo 'build $(stageName)'
               ls -l
-              cd /home/vsts/work/1/drop_${{ variables['stageName'] }}
+              cd /home/vsts/work/1/drop_$(stageName)
               ls -l
         - task: AzureStaticWebApp@0
           inputs:
