@@ -24,6 +24,7 @@ stages:
             versionSpec: '20.x'
           displayName: 'Install Node.js'
         - script: |
+            echo 'build $(environment)'
             npm install -g @angular/cli
             npm install
             ng build -c $(environment)
@@ -42,6 +43,8 @@ stages:
     jobs:
       - job: 
         steps: 
+        - script: |
+              echo 'build $(environment)'
         - task: AzureStaticWebApp@0
           inputs:
             skip_app_build: true 
