@@ -9,14 +9,14 @@ trigger:
 
 variables:
   - name: stageName
-    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/main') }}: # only works if you have a main branch
+    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}: # only works if you have a main branch
       value: production
-    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/stage') }}: # only works if you have a main branch
+    ${{ if eq(variables['Build.SourceBranchName'], 'stage') }}: # only works if you have a main branch
       value: stage
   - name: deployToken
-    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/main') }}: # only works if you have a main branch
+    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}: # only works if you have a main branch
       value: $(deployment_token_prod)
-    ${{ if eq(variables['Build.SourceBranchName'], 'refs/heads/stage') }}: # only works if you have a main branch
+    ${{ if eq(variables['Build.SourceBranchName'], 'stage') }}: # only works if you have a main branch
       value: $(deployment_token_stage)
 
 pool:
